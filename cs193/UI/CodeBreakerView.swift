@@ -21,8 +21,7 @@ struct CodeBreakerView: View {
     var body: some View {
         
         VStack{
-            
-            Button("Restart", action:restart)  // restart button
+            Button("Restart",systemImage: "arrow.circlepath", action:restart)  // restart button
             CodeView(code :game.masterCode)             // master code
                     {
                         Text("0:03").font(.title)
@@ -66,15 +65,6 @@ struct CodeBreakerView: View {
         selection = (selection + 1)%game.masterCode.pegs.count
     }
     
-//    
-//    var guessButton: some View {
-//        Button("guess", action:guess)
-//        .font(.system(size: guessButtonmagic.maximumfontSize))
-//        .minimumScaleFactor(guessButtonmagic.scaleFactor)
-//    }
-    
-    
-    
     func guess() {
         withAnimation{
             game.attemptGuess()
@@ -102,10 +92,6 @@ struct CodeBreakerView: View {
         }
     }
     
-    
-    
-    
-    
     struct guessButtonmagic{
         static let minimumfontSize: CGFloat = 8
         static let maximumfontSize: CGFloat = 80
@@ -113,31 +99,6 @@ struct CodeBreakerView: View {
     }
     
 }
-
-// Extending Animation for magic numbers
-extension Animation {
-    static let CodeBreaker = Animation.easeInOut(duration: 3)
-    static let restart = Animation.CodeBreaker
-    static let guess = Animation.CodeBreaker
-    
-}
-
-extension AnyTransition {
-    static let pegchooser = AnyTransition.offset(x:0, y:200)
-    static func attempt(_ gameOver: Bool) -> AnyTransition {
-        AnyTransition.asymmetric(
-            insertion: gameOver ? .opacity : .move(edge: .top),   // move makes it like sliding opacity makes it like one disappearing and appering
-            removal: .move(edge: .trailing))
-    }
-}
-
-
-extension Color {
-    static func gray(_ brightness: CGFloat) -> Color {
-        return Color(hue: 148/360, saturation: 0, brightness: brightness)
-    }
-}
-
 
 #Preview {
     CodeBreakerView()

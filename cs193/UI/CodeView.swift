@@ -16,6 +16,8 @@ struct CodeView<AncillaryView: View>: View {
     @Binding var selection: Int
     
     @ViewBuilder let ancillary : () -> AncillaryView
+    
+    @Namespace var selection_namespace
 
     
     init(code: Code,
@@ -34,10 +36,13 @@ struct CodeView<AncillaryView: View>: View {
                 PegView(Peg: code.pegs[index])
                     .padding(Selection.border)
                     .background{    // overlaying guess pegs
-                        if selection==index, code.kind == .guess{
-                            Selection.shape
-                                .foregroundStyle(Selection.color)
-                        }
+                        Group{
+                            if selection==index, code.kind == .guess{
+                                Selection.shape
+                                    .foregroundStyle(Selection.color)
+                                    .matchedGeometryEffect(id: "selectors", in: selection_namespace)
+                            }
+                        }.animation(Animation.selection, value:selection)
                     }
                     .overlay{   // hiding master block
                         if code.isHidden {
