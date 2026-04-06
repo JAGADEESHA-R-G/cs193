@@ -10,7 +10,7 @@ import SwiftUI
 
 // Extending Animation for magic numbers
 extension Animation {
-    static let CodeBreaker = Animation.default
+    static let CodeBreaker = Animation.easeInOut(duration: 3)
     static let restart = Animation.CodeBreaker
     static let guess = Animation.CodeBreaker
     static let selection = Animation.CodeBreaker

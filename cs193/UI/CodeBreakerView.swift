@@ -10,8 +10,11 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     
+    //MARK: DATA shared with me
+    @Binding var game: CodeBreaker
+    
     // MARK: Data Owned by me
-    @State private var game: CodeBreaker = CodeBreaker(pegChoices: [.gray, .green, .yellow, .red])
+//    @State private var game: CodeBreaker = CodeBreaker(pegChoices: [.gray, .green, .yellow, .red])
     
     @State private var selection = 0
     @State private var restarting: Bool = false
@@ -21,11 +24,14 @@ struct CodeBreakerView: View {
     var body: some View {
         
         VStack{
-            Button("Restart",systemImage: "arrow.circlepath", action:restart)  // restart button
+//            Button("Restart",systemImage: "arrow.circlepath", action:restart)  // restart button
             CodeView(code :game.masterCode)             // master code
-                    {
-                        Text("0:03").font(.title)
-                    }
+//                    {
+//                        ElapsedTime(startTime: game.startTime, endTime: game.endTime)
+////                            .flexibleSystemFont()
+//                            .monospaced()
+//                            .lineLimit(1)
+//                    }
             ScrollView{
                 if !game.gameOver || restarting {                      // scroll view for guess and attempts
                     CodeView(code :game.guess,
@@ -36,14 +42,14 @@ struct CodeBreakerView: View {
                         .minimumScaleFactor(guessButtonmagic.scaleFactor)
                     }
                     .animation(nil, value: game.attempts.count)    // makes the sliding from guess to attempts doesnt leave any after images.
-                    .opacity(restarting ? 0 : 1 )
+                    .opacity(restarting && game.gameOver ? 0 : 1 )
                 }
-                ForEach(game.attempts.indices.reversed(), id: \.self){ index in
-                    CodeView(code: game.attempts[index])
+                ForEach(game.attempts, id: \.pegs){ attempt in
+                    CodeView(code: attempt)
                     {
                         Group {
-                            if !hideMostRecentMarkers || index != game.attempts.count - 1 {
-                                MatchMarkers(matches: game.attempts[index].matches)
+                            if !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs  {
+                                MatchMarkers(matches: attempt.matches)
                             }else{
                                 EmptyView()
                             }
@@ -58,6 +64,17 @@ struct CodeBreakerView: View {
                 }).transition(AnyTransition.pegchooser)
             }
         }
+        .toolbar{
+            ToolbarItem(placement:.primaryAction){
+                Button("Restart",systemImage: "arrow.circlepath", action:restart)  // restart button
+            }
+            ToolbarItem{
+                ElapsedTime(startTime: game.startTime, endTime: game.endTime)
+                    .monospaced()
+                    .lineLimit(1)
+            }
+        }
+        
     }
     
     func changePegAtSelection(to peg: peg) {
@@ -80,8 +97,9 @@ struct CodeBreakerView: View {
     
     
     func restart(){
-        withAnimation{
+        withAnimation(Animation.restart){
             restarting = true
+
         }
         completion: {
             withAnimation(Animation.restart){
@@ -101,5 +119,8 @@ struct CodeBreakerView: View {
 }
 
 #Preview {
-    CodeBreakerView()
+    @Previewable @State var game:CodeBreaker = CodeBreaker(name:"Test", pegChoices :[.red, .green, .purple, .orange])
+    NavigationStack{
+        CodeBreakerView(game:$game)
+    }
 }

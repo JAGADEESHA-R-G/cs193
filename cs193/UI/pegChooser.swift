@@ -10,7 +10,7 @@ import SwiftUI
 struct pegChooser: View {
     
     let choices: [peg]
-    let onChoose: ((peg) -> Void)
+    var onChoose: ((peg) -> Void)?
     
     
 //    @Binding var game:CodeBreaker
@@ -20,7 +20,7 @@ struct pegChooser: View {
         HStack{
             ForEach(choices, id: \.self) { peg in
                 Button(action: {
-                        onChoose(peg)
+                        onChoose?(peg)
                 }) {
                     PegView(Peg: peg)
                 }

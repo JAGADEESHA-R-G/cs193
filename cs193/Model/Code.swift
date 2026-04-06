@@ -9,14 +9,15 @@
 import Foundation
 import SwiftUI
 
-struct Code {
+struct Code: Hashable{
+//    var id = UUID()       // used in case of making this identifiable
     
     var kind: Kind
     var pegs: [peg] = Array(repeating: Code.missingPeg, count: 4)
     
     static let missingPeg: peg = .clear
     
-    enum Kind: Equatable {
+    enum Kind: Hashable, Equatable {
         case master(isHidden : Bool)
         case guess
         case attempt([Match])

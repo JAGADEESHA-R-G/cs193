@@ -10,7 +10,9 @@ import SwiftUI
 struct cs193App: App {
     var body: some Scene {
         WindowGroup {
-            CodeBreakerView()
+//            CodeBreakerView()
+            GameChooser()
+            
         }
     }
 }
