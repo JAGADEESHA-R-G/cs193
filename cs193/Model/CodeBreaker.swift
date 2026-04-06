@@ -10,7 +10,7 @@ import SwiftUI
 
 typealias peg = Color
 
-struct CodeBreaker {
+@Observable class CodeBreaker{               // Since this model is a class now it compiles to Identifiable easily
     var name:String
     var masterCode: Code = Code(kind: .master(isHidden: true))
     var guess: Code = Code(kind: .guess)
@@ -30,7 +30,7 @@ struct CodeBreaker {
         attempts.first?.pegs == masterCode.pegs
     }
     
-    mutating func attemptGuess(){
+    func attemptGuess(){
         
         guard !attempts.contains(where: {$0.pegs==guess.pegs}) else {return}
         
@@ -45,7 +45,7 @@ struct CodeBreaker {
     }
     
     
-    mutating func restart(){
+    func restart(){
         masterCode.kind = .master(isHidden: true)
         masterCode.randomize(from: pegChoices)
         attempts.removeAll()
@@ -55,13 +55,13 @@ struct CodeBreaker {
     }
     
     
-    mutating func setGuessPeg(_ Peg: peg, at Index: Int) {
+    func setGuessPeg(_ Peg: peg, at Index: Int) {
         guard guess.pegs.indices.contains(Index) else { return }
         guess.pegs[Index] = Peg
      }
      
     
-    mutating func changeGuessPeg(at index: Int){
+    func changeGuessPeg(at index: Int){
         
         let existingPeg = guess.pegs[index]
         if let indexOfExistingPegInPegChoices = pegChoices.firstIndex(of: existingPeg){
@@ -76,5 +76,18 @@ struct CodeBreaker {
 }
 
 
+
+
+extension CodeBreaker : Identifiable, Hashable, Equatable {
+    
+    static func == (lhs: CodeBreaker, rhs: CodeBreaker) -> Bool {
+        lhs.id == rhs.id                                                // id we get it when we make it identifiable
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+}
 
 

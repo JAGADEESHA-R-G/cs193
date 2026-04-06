@@ -13,17 +13,27 @@ struct GameChooser: View {
 
     var body: some View {
         NavigationStack{
-            List($Games, id: \.pegChoices, editActions: [.delete, .move]){ $game in
-                NavigationLink{
-                    CodeBreakerView(game:$game)
-                }label: {
-                    gameSummary(game:game)
+            List{
+                ForEach(Games){ game in
+                    NavigationLink(value: game){
+                        gameSummary(game:game)
+                    }
                 }
+                .onDelete{ offsets in
+                    Games.remove(atOffsets: offsets )
+                }
+                .onMove{ offsets, destination in
+                    Games.move(fromOffsets: offsets, toOffset: destination)
+                }
+            }
+            .navigationDestination(for: CodeBreaker.self){game in  // CodeBreaker needs to be hashable here because once we click on navigation link it needs to uniquely identify which one is to to pass to CodeBreakerView
+                CodeBreakerView(game: game)
             }
             .toolbar{
                 EditButton()
             }
         }
+        
         .listStyle(.plain)
         .onAppear{
             Games.append(CodeBreaker(name:"Main", pegChoices: [.red, .green, .orange, .yellow]))
