@@ -8,22 +8,37 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
-struct Code: Hashable{
+@Model class Code: Hashable{
 //    var id = UUID()       // used in case of making this identifiable
     
-    var kind: Kind
+    var _kind: String = Kind.unknown.description             // used as proxy for storing in DB
     var pegs: [peg] = Array(repeating: Code.missingPeg, count: 4)
     
-    static let missingPeg: peg = .clear
-    
-    enum Kind: Hashable, Equatable {
-        case master(isHidden : Bool)
-        case guess
-        case attempt([Match])
-        case unknown
+    var kind: Kind {
+        get{
+            return Kind(_kind)          // used for getting _kind variable to actual value
+        }
+        set{
+            _kind = newValue.description        // used for setting the kind variable to _kind string value for storing in DB
+        }
     }
     
+    init(kind: Kind, pegs: [peg] = Array(repeating: Code.missingPeg, count: 4)) {
+        self.kind = kind
+        self.pegs = pegs
+    }
+    
+    static let missingPeg: peg = ""
+    
+//    enum Kind: Hashable, Equatable {
+//        case master(isHidden : Bool)
+//        case guess
+//        case attempt([Match])
+//        case unknown
+//    }
+//    
     
     var isHidden : Bool {
         switch kind {
@@ -42,13 +57,13 @@ struct Code: Hashable{
     }
     
     
-    mutating func reset() {
+    func reset() {
         self.pegs = Array(repeating: Code.missingPeg, count: 4)
     }
     
     
     
-    mutating func randomize(from pegChoices: [peg]) {
+    func randomize(from pegChoices: [peg]) {
         for index in pegs.indices {
             pegs[index] = pegChoices.randomElement() ?? Code.missingPeg
         }
@@ -82,4 +97,11 @@ struct Code: Hashable{
     
     
     
+}
+
+
+enum Match: String {            // : String gives the rawValue meaing Match.rawValue gives "nomatch" in string format when needed
+    case nomatch
+    case exact
+    case inexact
 }

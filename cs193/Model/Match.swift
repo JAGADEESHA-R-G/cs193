@@ -1,10 +1,18 @@
-import Foundation
+//
+//  Match.swift
+//  cs193
+//
+//  Created by Jagadeesh on 11/04/26.
+//
 
-enum Match: String, Codable {
-    case nomatch
-    case exact
-    case inexact
-}
+
+import Foundation
+//
+//enum Match: String, Codable {
+//    case nomatch
+//    case exact
+//    case inexact
+//}
 
 enum Kind: Equatable, CustomStringConvertible {
     case master(isHidden: Bool)

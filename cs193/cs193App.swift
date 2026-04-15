@@ -5,6 +5,7 @@
 //  Created by Jagadeesh on 30/03/26.
 //
 import SwiftUI
+import SwiftData
 
 @main
 struct cs193App: App {
@@ -12,6 +13,7 @@ struct cs193App: App {
         WindowGroup {
 //            CodeBreakerView()
             GameChooser()
+                .modelContainer(for:CodeBreaker.self)
             
         }
     }

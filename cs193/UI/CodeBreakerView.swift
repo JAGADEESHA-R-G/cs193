@@ -13,6 +13,8 @@ struct CodeBreakerView: View {
     //MARK: DATA shared with me
     let game: CodeBreaker
     
+    @Environment(\.scenePhase) var scenePhase
+    
     // MARK: Data Owned by me
 //    @State private var game: CodeBreaker = CodeBreaker(pegChoices: [.gray, .green, .yellow, .red])
     
@@ -62,14 +64,29 @@ struct CodeBreakerView: View {
                 pegChooser(choices:game.pegChoices, onChoose: { peg in   // peg chooser
                     changePegAtSelection(to: peg)
                 }).transition(AnyTransition.pegchooser)
+                    .frame(maxHeight:90)
             }
         }
+        .onAppear(){
+            game.startTimer()
+        }
+        .onDisappear(){
+            game.pauseTimer()
+        }
+        .onChange(of: scenePhase){
+            switch scenePhase{
+            case .active: game.startTimer()
+            case .background: game.pauseTimer()
+            default : break
+            }
+        }
+        
         .toolbar{
             ToolbarItem(placement:.primaryAction){
                 Button("Restart",systemImage: "arrow.circlepath", action:restart)  // restart button
             }
             ToolbarItem{
-                ElapsedTime(startTime: game.startTime, endTime: game.endTime)
+                ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
                     .monospaced()
                     .lineLimit(1)
             }
@@ -118,7 +135,28 @@ struct CodeBreakerView: View {
     
 }
 
-#Preview {
+
+extension CodeBreaker {
+    // A "Convenience" init must always call self.init() at the end
+    convenience init(name: String = "Code Breaker", pegChoices: [Color]) {
+        // We translate [Color] -> [String] on the fly
+        let hexStrings = pegChoices.map { $0.toHex() }
+        
+        // Pass the translated strings to the main initializer
+        self.init(name: name, pegChoices: hexStrings)
+    }
+    
+    var pegColorChoices: [Color] {
+        get {
+            pegChoices.map { Color(hex: $0) }
+        }
+        set {
+            pegChoices = newValue.map { $0.toHex() }
+        }
+    }
+}
+
+#Preview(traits: .swiftData)  {
     @Previewable @State var game:CodeBreaker = CodeBreaker(name:"Test", pegChoices :[.red, .green, .purple, .orange])
     NavigationStack{
         CodeBreakerView(game:game)

@@ -7,17 +7,20 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
-typealias peg = Color
+typealias peg = String
 
-@Observable class CodeBreaker{               // Since this model is a class now it compiles to Identifiable easily
+@Model class CodeBreaker{               // Since this model is a class now it compiles to Identifiable easily
     var name:String
-    var masterCode: Code = Code(kind: .master(isHidden: true))
-    var guess: Code = Code(kind: .guess)
-    var attempts:[Code] = [Code]()
+    @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true))
+    @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess)
+    @Relationship(deleteRule: .cascade) var attempts:[Code] = [Code]()
     var pegChoices:[peg]
-    var startTime: Date = Date.now
+    @Transient var startTime: Date?
     var endTime: Date?
+    var elapsedTime: TimeInterval = 0
+        
         
     init(name:String = "codebreaker", pegChoices:[peg]) {
         self.name = name
@@ -34,16 +37,35 @@ typealias peg = Color
         
         guard !attempts.contains(where: {$0.pegs==guess.pegs}) else {return}
         
-        var attempt = guess
-        attempt.kind = .attempt(guess.match(against: masterCode))
+//        var attempt = guess
+//        attempt.kind = .attempt(guess.match(against: masterCode))
+        
+        let attempt = Code(kind: .attempt(guess.match(against: masterCode)),        // Added when Code is converted to @Model from struct
+                           pegs: guess.pegs)
+        
         attempts.insert(attempt, at: 0)
         guess.reset()
         if gameOver{
             masterCode.kind = .master(isHidden: false)
             endTime = .now
+            pauseTimer()
         }
     }
     
+    func startTimer(){
+        if startTime == nil, !gameOver{
+            startTime = .now
+            elapsedTime += 0.00001
+        }
+    }
+    
+    func pauseTimer(){
+        if let startTime{
+            elapsedTime += Date.now.timeIntervalSince(startTime)
+        }
+        startTime = nil
+    }
+
     
     func restart(){
         masterCode.kind = .master(isHidden: true)
@@ -52,6 +74,7 @@ typealias peg = Color
         guess.reset()
         startTime = .now
         endTime = nil
+        elapsedTime = 0
     }
     
     
@@ -76,18 +99,18 @@ typealias peg = Color
 }
 
 
-
-
-extension CodeBreaker : Identifiable, Hashable, Equatable {
-    
-    static func == (lhs: CodeBreaker, rhs: CodeBreaker) -> Bool {
-        lhs.id == rhs.id                                                // id we get it when we make it identifiable
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    
-}
-
-
+//
+//
+//extension CodeBreaker : Identifiable, Hashable, Equatable {
+//    
+//    static func == (lhs: CodeBreaker, rhs: CodeBreaker) -> Bool {
+//        lhs.id == rhs.id                                                // id we get it when we make it identifiable
+//    }
+//    
+//    func hash(into hasher: inout Hasher) {
+//        hasher.combine(id)
+//    }
+//    
+//}
+//
+//

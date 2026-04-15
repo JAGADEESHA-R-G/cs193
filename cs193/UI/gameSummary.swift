@@ -20,7 +20,7 @@ struct gameSummary: View {
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData)  {
     List{
         gameSummary(game:CodeBreaker(name: "check", pegChoices: [.cyan]))
     }

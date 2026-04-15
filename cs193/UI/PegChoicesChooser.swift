@@ -8,11 +8,48 @@
 import SwiftUI
 
 struct PegChoicesChooser: View {
+    @Binding var PegChoices: [Color]
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List{
+            ForEach(PegChoices.indices, id:\.self){ index in
+                ColorPicker(
+                    selection : $PegChoices[index]
+                    
+                ){
+                    button(image: "minus.circle", title: "delete", color:.red){
+                        PegChoices.remove(at:index)
+                    }
+                }
+            }
+            button(image: "plus.circle", title: "Add Peg", color:.green){
+                PegChoices.append(.green)
+            }
+        }
     }
+    
+    
+    
+    func button(
+        image: String,
+        title: String,
+        color:Color,
+        action: @escaping () -> Void
+    )
+    -> some View{
+        HStack{
+            Button{
+                action()
+                
+            }label:{
+                Image(systemName: image).tint(color)
+            }
+            Text(title)
+        }
+    }
+    
 }
 
 #Preview {
-    PegChoicesChooser()
+    @Previewable @State var PegChoices:[Color] = [Color.green, .red]
+    PegChoicesChooser(PegChoices: $PegChoices)
 }
